@@ -1,6 +1,6 @@
 # Product Mapper
 
-The **Product Mapper** is a tool designed to help users map products to predefined categories or tags. The system allows users to input product data, perform mappings, and store the information in a database for further analysis or use. It is built with **React** for the frontend and **Node.js** with **Express** for the backend. The database interaction is facilitated by a chosen database (e.g., MongoDB).
+The **Product Mapper** is a tool designed to help users map products to predefined categories or tags. The system allows users to input product data, perform mappings, and store the information in a database for further analysis or use. It is built with **HTML,CSS** for the frontend and **Node.js** with **Express** for the backend. The database interaction is facilitated by a chosen database (e.g., MongoDB).
 
 ## Demo
 You can find the working prototype of the Product Mapper in action ( https://profound-fenglisu-7d10a3.netlify.app/ )(provide the link when deployed).
@@ -14,7 +14,7 @@ You can find the working prototype of the Product Mapper in action ( https://pro
 
 ## Technologies Used
 
-- **Frontend**: React.js, HTML, CSS, JavaScript
+- **Frontend**:  HTML, CSS, JavaScript
 - **Backend**: Node.js, Express
 - **Database**: MongoDB (or MySQL, based on your choice)
 - **Version Control**: Git, GitHub
@@ -29,4 +29,4 @@ You can find the working prototype of the Product Mapper in action ( https://pro
 
 1. Clone this repository to your local machine.
    ```bash
-   git clone https://github.com/your-username/product-mapper.git
+   git clone https://github.com/Tusharpandey716/product-mapper.git
