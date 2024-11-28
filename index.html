@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Mapping System</title>
+    <style>
+        /* General styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #74ebd5, #9face6);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: #6a11cb;
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f4f4f4;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 15px 0;
+            cursor: pointer;
+            font-weight: bold;
+            color: #555;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .tab.active {
+            background: #6a11cb;
+            color: white;
+        }
+
+        .tab:hover {
+            background: #6a11cb;
+            color: white;
+        }
+
+        .content {
+            display: none;
+            padding: 20px;
+        }
+
+        .content.active {
+            display: block;
+        }
+
+        label {
+            display: block;
+            margin: 15px 0 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        input[type="text"], button {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            background: #2575fc;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #6a11cb;
+        }
+
+        .mapping-list ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .mapping-list ul li {
+            background: #f4f4f4;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Product Mapping System</h1>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" data-tab="find-product">Find Standardized Product</div>
+            <div class="tab" data-tab="add-mapping">Add a New Mapping</div>
+            <div class="tab" data-tab="current-mappings">Current Mappings</div>
+        </div>
+
+        <!-- Find Product Section -->
+        <div class="content active" id="find-product">
+            <label for="productInput">Enter Product Name</label>
+            <input type="text" id="productInput" placeholder="Enter product name">
+            <button onclick="findMatch()">Find Match</button>
+            <div id="output"></div>
+        </div>
+
+        <!-- Add Mapping Section -->
+        <div class="content" id="add-mapping">
+            <label for="standardName">Standardized Product Name</label>
+            <input type="text" id="standardName" placeholder="Enter standardized product name">
+            <label for="newVariation">New Product Variation</label>
+            <input type="text" id="newVariation" placeholder="Enter new variation">
+            <button onclick="addMapping()">Add Mapping</button>
+        </div>
+
+        <!-- Current Mappings Section -->
+        <div class="content" id="current-mappings">
+            <h3>All Mappings</h3>
+            <div class="mapping-list">
+                <ul id="mappingList">
+                    <li>Loading...</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab Navigation
+        const tabs = document.querySelectorAll(".tab");
+        const contents = document.querySelectorAll(".content");
+
+        tabs.forEach(tab => {
+            tab.addEventListener("click", () => {
+                // Reset all tabs and contents
+                tabs.forEach(t => t.classList.remove("active"));
+                contents.forEach(c => c.classList.remove("active"));
+
+                // Activate clicked tab and its content
+                tab.classList.add("active");
+                document.getElementById(tab.dataset.tab).classList.add("active");
+            });
+        });
+
+        // Fetch mappings and display them
+        async function fetchMappings() {
+            const mappingList = document.getElementById("mappingList");
+            mappingList.innerHTML = "<li>Loading mappings...</li>";
+
+            try {
+                const response = await fetch("http://localhost:3000/mappings");
+                const mappings = await response.json();
+
+                if (mappings.length > 0) {
+                    mappingList.innerHTML = mappings.map(
+                        mapping => `<li><strong>${mapping.standard_name}</strong>: ${mapping.variation}</li>`
+                    ).join("");
+                } else {
+                    mappingList.innerHTML = "<li>No mappings found.</li>";
+                }
+            } catch (error) {
+                mappingList.innerHTML = "<li>Error fetching mappings.</li>";
+            }
+        }
+
+        // Find Match Function
+        async function findMatch() {
+            const productInput = document.getElementById("productInput").value;
+            const output = document.getElementById("output");
+
+            try {
+                const response = await fetch("http://localhost:3000/find", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ product: productInput })
+                });
+
+                const result = await response.json();
+                output.innerHTML = result.match
+                    ? `Matched to standardized name: <strong>${result.match}</strong>`
+                    : "No match found. Please add it manually.";
+            } catch (error) {
+                output.innerHTML = "Error finding match.";
+            }
+        }
+
+        // Add Mapping Function
+        async function addMapping() {
+            const standardName = document.getElementById("standardName").value;
+            const newVariation = document.getElementById("newVariation").value;
+
+            try {
+                const response = await fetch("http://localhost:3000/add", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ standardName, newVariation })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    alert(`Mapping added successfully!`);
+                    fetchMappings(); // Refresh mappings
+                } else {
+                    alert(`Error adding mapping.`);
+                }
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+            }
+        }
+
+        // Load mappings on page load
+        document.addEventListener("DOMContentLoaded", fetchMappings);
+    </script>
+</body>
+</html>
